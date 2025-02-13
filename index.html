@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Livestock Housing Sankey Diagram</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: 'Noto Sans JP', sans-serif;
+      }
+      .node rect {
+        cursor: move;
+        fill-opacity: 0.9;
+        shape-rendering: crispEdges;
+      }
+      .node text {
+        pointer-events: none;
+        font-size: 12px;
+      }
+      .node .value-label {
+        font-size: 11px;
+        fill: #666;
+      }
+      .link {
+        fill: none;
+        stroke-opacity: 0.2;
+      }
+      .link:hover {
+        stroke-opacity: 0.5;
+      }
+      #download-button {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        padding: 10px 20px;
+        background-color: #C4C4C4;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: 'Noto Sans JP', sans-serif;
+      }
+      #download-button:hover {
+        background-color: #626262;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="download-button">SVGをダウンロード</button>
+    <div id="chart"></div>
+    <script>
+      // データの準備
+      const data = {
+        nodes: [
+          // 左側のノード（A開放鶏舎）
+          { id: 0, name: 'A開放鶏舎', category: 'source' },
+          // 中央のノード（飼養形態）
+          { id: 1, name: 'Aライン(ヒナ段)', category: 'aline' },
+          { id: 2, name: '直立', category: 'chokuritsu' },
+          { id: 3, name: 'エンリッチ', category: 'enrich' },
+          { id: 4, name: '平飼い', category: 'flat' },
+          { id: 5, name: '放し飼い', category: 'free' },
+          { id: 6, name: 'その他', category: 'other' },
+          // 右側のノード（Bケージ型）
+          { id: 7, name: 'Bケージ型別棟数計', category: 'target' },
+        ],
+        links: [
+          // A開放鶏舎からの接続
+          { source: 0, target: 1, value: 1642 },
+          { source: 0, target: 2, value: 218 },
+          { source: 0, target: 3, value: 4 },
+          { source: 0, target: 4, value: 198 },
+          { source: 0, target: 5, value: 42 },
+          { source: 0, target: 6, value: 20 },
+          // Bケージ型への接続
+          { source: 1, target: 7, value: 431 },
+          { source: 2, target: 7, value: 341 },
+          { source: 3, target: 7, value: 8 },
+          { source: 4, target: 7, value: 12 },
+          { source: 5, target: 7, value: 0 },
+          { source: 6, target: 7, value: 1 },
+        ],
+      };
+
+      // SVGの設定
+      const width = 960;
+      const height = 600;
+      const margin = { top: 10, right: 150, bottom: 10, left: 150 };
+
+      // カラースケールの設定
+      const color = d3
+        .scaleOrdinal()
+        .domain([
+          'source',
+          'aline',
+          'chokuritsu',
+          'enrich',
+          'flat',
+          'free',
+          'other',
+          'target',
+        ])
+        .range([
+          '#FBF5EB', // source: 薄いベージュ（A開放鶏舎）
+          '#4682B4', // aline: スティールブルー（Aライン - 近代的な設備のイメージ）
+          '#556B2F', // chokuritsu: ダークオリーブグリーン（直立 - 垂直性を強調）
+          '#9370DB', // enrich: ミディアムパープル（エンリッチ - 豊かさを表現）
+          '#8B4513', // flat: サドルブラウン（平飼い - 土や地面のイメージ）
+          '#FFB347', // free: 明るいオレンジ（放し飼い - 太陽や自由なイメージ）
+          '#808080', // other: グレー（その他）
+          '#CFB7A3', // target: ライトブラウン（Bケージ型）
+        ]);
+
+      // SVG要素の作成
+      const svg = d3
+        .select('#chart')
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height);
+
+      // Sankeyレイアウトの設定
+      const sankey = d3
+        .sankey()
+        .nodeId((d) => d.id)
+        .nodeWidth(15)
+        .nodePadding(20)
+        .extent([
+          [margin.left, margin.top],
+          [width - margin.right, height - margin.bottom],
+        ]);
+
+      // データの適用
+      const { nodes, links } = sankey(data);
+
+      // グラデーションの定義
+      const defs = svg.append('defs');
+      links.forEach((link, i) => {
+        const gradient = defs
+          .append('linearGradient')
+          .attr('id', `gradient-${i}`)
+          .attr('gradientUnits', 'userSpaceOnUse')
+          .attr('x1', link.source.x1)
+          .attr('x2', link.target.x0);
+
+        gradient
+          .append('stop')
+          .attr('offset', '0%')
+          .attr('stop-color', color(link.source.category));
+
+        gradient
+          .append('stop')
+          .attr('offset', '100%')
+          .attr('stop-color', color(link.target.category));
+      });
+
+      // リンクの描画
+      svg
+        .append('g')
+        .selectAll('path')
+        .data(links)
+        .join('path')
+        .attr('class', 'link')
+        .attr('d', d3.sankeyLinkHorizontal())
+        .attr('stroke-width', (d) => Math.max(1, d.width))
+        .style('stroke', (d, i) => `url(#gradient-${i})`)
+        .style('fill', 'none');
+
+      // ノードの描画
+      const node = svg
+        .append('g')
+        .selectAll('g')
+        .data(nodes)
+        .join('g')
+        .attr('class', 'node')
+        .attr('transform', (d) => `translate(${d.x0},${d.y0})`);
+
+      // ノードの矩形を描画
+      node
+        .append('rect')
+        .attr('height', (d) => d.y1 - d.y0)
+        .attr('width', (d) => d.x1 - d.x0)
+        .attr('fill', (d) => color(d.category));
+
+      // ノードのラベルを描画
+      const nodeText = node.append('g').attr('class', 'node-text');
+
+      // タイトルと値の描画
+      nodeText.each(function (d) {
+        const text = d3.select(this);
+        const isEndNode =
+          d.x0 === margin.left || d.x0 > width - margin.right - 50;
+
+        if (isEndNode) {
+          // 端のノードは2行で表示
+          text
+            .append('text')
+            .attr('x', -10)
+            .attr('y', (d) => (d.y1 - d.y0) / 2 - 6)
+            .attr('dy', '0.35em')
+            .attr('text-anchor', 'end')
+            .text(d.name);
+
+          text
+            .append('text')
+            .attr('class', 'value-label')
+            .attr('x', -10)
+            .attr('y', (d) => (d.y1 - d.y0) / 2 + 6)
+            .attr('dy', '0.35em')
+            .attr('text-anchor', 'end')
+            .text(`${d.value || 0} 棟`);
+        } else {
+          // 中央のノードは1行で表示（名前と値を別々のテキスト要素で作成）
+          const centerText = text
+            .append('text')
+            .attr('x', d.x0 < width / 2 ? -40 : 6 + (d.x1 - d.x0))
+            .attr('y', (d) => (d.y1 - d.y0) / 2)
+            .attr('dy', '0.35em')
+            .attr('text-anchor', d.x0 < width / 2 ? 'end' : 'start')
+            .text(d.name);
+
+          // 値のテキストを追加
+          text
+            .append('text')
+            .attr('class', 'value-label')
+            .attr('x', d.x0 < width / 2 ? -38 : 30 + (d.x1 - d.x0))
+            .attr('y', (d) => (d.y1 - d.y0) / 2)
+            .attr('dy', '0.35em')
+            .attr('text-anchor', d.x0 < width / 2 ? 'start' : 'end')
+            .text(`${d.value || 0}棟`);
+        }
+      });
+
+      // ホバー時のツールチップ
+      node.append('title').text((d) => `${d.name}\n${d.value || '0'} 棟`);
+
+      // SVGダウンロード機能
+      document
+        .getElementById('download-button')
+        .addEventListener('click', function () {
+          // SVGの内容を取得
+          const svgData = document.querySelector('svg');
+          const serializer = new XMLSerializer();
+          const svgString = serializer.serializeToString(svgData);
+
+          // フォントを埋め込むためのスタイル追加
+          const svgWithFont = svgString.replace(
+            '</svg>',
+            `<style>
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500&amp;display=swap');
+            text { font-family: 'Noto Sans JP', sans-serif; }
+          </style>
+          </svg>`,
+          );
+
+          // Blobの作成
+          const blob = new Blob([svgWithFont], { type: 'image/svg+xml' });
+
+          // ダウンロードリンクの作成
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'livestock-sankey-diagram.svg';
+
+          // ダウンロードの実行
+          document.body.appendChild(a);
+          a.click();
+
+          // クリーンアップ
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        });
+    </script>
+  </body>
+</html>

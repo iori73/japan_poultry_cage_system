@@ -1,0 +1,120 @@
+{
+    "name": "Root",
+    "children": [
+      {
+        "name": "Aライン(ヒナ段)",
+        "children": [
+          {
+            "name": "A開放鶏舎",
+            "children": [
+              { "name": "回答数(戸)", "value": 246 },
+              { "name": "合計(棟)", "value": 1642 }
+            ]
+          },
+          {
+            "name": "Bケージ型別棟数計",
+            "children": [
+              { "name": "回答数(戸)", "value": 98 }, 
+              { "name": "合計(棟)", "value": 431 } 
+            ]
+          }
+        ]
+      },
+      {
+        "name": "直立",
+        "children": [
+          {
+            "name": "A開放鶏舎",
+            "children": [
+              { "name": "回答数(戸)", "value": 47 },
+              { "name": "合計(棟)", "value": 218 }
+            ]
+          },
+          {
+            "name": "Bケージ型別棟数計",
+            "children": [
+              { "name": "回答数(戸)", "value": 149 }, 
+              { "name": "合計(棟)", "value": 341 } 
+            ]
+          }
+        ]
+      },
+      {
+        "name": "エンリッチ",
+        "children": [
+          {
+            "name": "A開放鶏舎",
+            "children": [
+              { "name": "回答数(戸)", "value": 3 },
+              { "name": "合計(棟)", "value": 4 }
+            ]
+          },
+          {
+            "name": "Bケージ型別棟数計",
+            "children": [
+              { "name": "回答数(戸)", "value": 4 },
+              { "name": "合計(棟)", "value": 8 } 
+            ]
+          }
+        ]
+      },
+
+      {
+        "name": "平飼い",
+        "children": [
+          {
+            "name": "A開放鶏舎",
+            "children": [
+              { "name": "回答数(戸)", "value": 41 },
+              { "name": "合計(棟)", "value": 198 }
+            ]
+          },
+          {
+            "name": "Bケージ型別棟数計",
+            "children": [
+              { "name": "回答数(戸)", "value": 3 },
+              { "name": "合計(棟)", "value": 12 } 
+            ]
+          }
+        ]
+      },
+      {
+        "name": "放し飼い",
+        "children": [
+          {
+            "name": "A開放鶏舎",
+            "children": [
+              { "name": "回答数(戸)", "value": 10 },
+              { "name": "合計(棟)", "value": 42 }
+            ]
+          },
+          {
+            "name": "Bケージ型別棟数計",
+            "children": [
+              { "name": "回答数(戸)", "value": 0 },  
+              { "name": "合計(棟)", "value": 0 } 
+            ]
+          }
+        ]
+      },
+      {
+        "name": "その他",
+        "children": [
+          {
+            "name": "A開放鶏舎",
+            "children": [
+              { "name": "回答数(戸)", "value": 4 },
+              { "name": "合計(棟)", "value": 20 }
+            ]
+          },
+          {
+            "name": "Bケージ型別棟数計",
+            "children": [
+              { "name": "回答数(戸)", "value": 1 },  
+              { "name": "合計(棟)", "value": 1 }
+            ]
+          }
+        ]
+      }
+    ]
+  }
